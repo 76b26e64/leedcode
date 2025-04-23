@@ -50,66 +50,32 @@ s contains only the characters ('I', 'V', 'X', 'L', 'C', 'D', 'M').
 It is guaranteed that s is a valid roman numeral in the range [1, 3999].
 */
 
+int roman_char_to_int(char c) {
+    switch(c){
+        case 'I': return 1;
+        case 'V': return 5;
+        case 'X': return 10;
+        case 'L': return 50;
+        case 'C': return 100;
+        case 'D': return 500;
+        case 'M': return 1000;
+        default : break;
+    }
+    return 0;
+}
+
 int romanToInt(char* s) {
     if(!s){
         return 0;
     }
 
     int num = 0;
-    while(*s != '\0'){
-        //printf("%p = %c\n", s, *s);
-        char c = *s;
-        switch(c){
-            case 'I':
-                if(*(s+1) == 'V'){
-                    num += 4;
-                    s++;
-                }else if(*(s+1) == 'X'){
-                    num += 9;
-                    s++;
-                }else{
-                    num += 1;
-                }
-                break;
-            case 'V':
-                num += 5;
-                break;
-            case 'X':
-                if(*(s+1) == 'L'){
-                    num += 40;
-                    s++;
-                }else if(*(s+1) == 'C'){
-                    num += 90;
-                    s++;
-                }else{
-                    num += 10;
-                }
-                break;
-            case 'L':
-                num += 50;
-                break;
-            case 'C':
-                if(*(s+1) == 'D'){
-                    num += 400;
-                    s++;
-                }else if(*(s+1) == 'M'){
-                    num += 900;
-                    s++;
-                }else{
-                    num += 100;
-                }
-                break;
-            case 'D':
-                num += 500;
-                break;
-            case 'M':
-                num += 1000;
-                break;
-            default:
-                break;
+    for(int i=0; i<strlen(s); i++){
+        if(i != 0 && roman_char_to_int(s[i-1]) < roman_char_to_int(s[i])){
+            num += roman_char_to_int(s[i]) - (roman_char_to_int(s[i-1]) * 2);
+        }else{
+            num += roman_char_to_int(s[i]);
         }
-        s++;
     }
-
     return num;
 }
