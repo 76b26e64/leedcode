@@ -49,15 +49,13 @@ Constraints:
 At most 3000 calls will be made to enQueue, deQueue, Front, Rear, isEmpty, and isFull.
 */
 
-
-
-
 typedef struct {
     int *buf;
     int size;
     unsigned int front;
     unsigned int rear;
     int capacity;
+    pthread_mutex_t lock;
 } MyCircularQueue;
 
 
@@ -69,59 +67,107 @@ MyCircularQueue* myCircularQueueCreate(int k) {
     obj->buf = calloc(k, sizeof(int));
     obj->capacity = k;
 
+    pthread_mutex_init(&(obj->lock), NULL);
+
     return obj;
 }
 
 bool myCircularQueueEnQueue(MyCircularQueue* obj, int value) {
-    if(!obj || obj->size == obj->capacity){
-        return false;
+    bool ret = false; 
+    if(!obj){
+        return ret;
     }
-
-    obj->buf[obj->rear++] = value;
-    obj->rear %= obj->capacity;
-    (obj->size)++;
-    return true;
+   
+    pthread_mutex_lock(&(obj->lock));
+    if(obj->size != obj->capacity){
+        obj->buf[obj->rear++] = value;
+        obj->rear %= obj->capacity;
+        (obj->size)++;
+        ret = true; 
+    }
+    pthread_mutex_unlock(&(obj->lock));
+    
+    return ret;
 }
 
 bool myCircularQueueDeQueue(MyCircularQueue* obj) {
-    if(!obj || obj->size == 0){
-        return false;
+    bool ret = false; 
+    if(!obj){
+        return ret;
     }
+
+    pthread_mutex_lock(&(obj->lock));
+    if(obj->size != 0){
+        obj->front++;
+        obj->front %= obj->capacity;
+        (obj->size)--;
+        ret = true; 
+    }
+    pthread_mutex_unlock(&(obj->lock));
     
-    obj->front++;
-    obj->front %= obj->capacity;
-    (obj->size)--;
-    return true;
+    return ret;
 }
 
 int myCircularQueueFront(MyCircularQueue* obj) {
-    if(!obj || obj->size == 0){
-        return -1;
+    int ret = -1; 
+    if(!obj){
+        return ret;
     }
-    int index = obj->front % obj->capacity;
-    return obj->buf[index];
+    
+    pthread_mutex_lock(&(obj->lock));
+    if(obj->size != 0){
+        int index = obj->front % obj->capacity;
+        ret = obj->buf[index];
+    }
+    pthread_mutex_unlock(&(obj->lock));
+    return ret;
 }
 
 int myCircularQueueRear(MyCircularQueue* obj) {
-    if(!obj || obj->size == 0){
-        return -1;
+    int ret = -1; 
+    if(!obj){
+        return ret;
     }
-    int index = (obj->capacity + obj->rear - 1) % obj->capacity;
-    return obj->buf[index];
+
+    pthread_mutex_lock(&(obj->lock));
+    if(obj->size != 0){
+        int index = (obj->capacity + obj->rear - 1) % obj->capacity;
+        ret = obj->buf[index];
+    }
+    pthread_mutex_unlock(&(obj->lock));
+    return ret;
 }
 
 bool myCircularQueueIsEmpty(MyCircularQueue* obj) {
-    return (obj && obj->size == 0);
+    bool ret = false; 
+    if(!obj){
+        return ret;
+    }
+
+    pthread_mutex_lock(&(obj->lock));
+    ret = (obj->size == 0);
+    pthread_mutex_unlock(&(obj->lock));
+    return ret;
 }
 
 bool myCircularQueueIsFull(MyCircularQueue* obj) {
-    return (obj && obj->size == obj->capacity);
+    bool ret = false; 
+    if(!obj){
+        return ret;
+    }
+
+    pthread_mutex_lock(&(obj->lock));
+    ret = (obj->size == obj->capacity);
+    pthread_mutex_unlock(&(obj->lock));
+    return ret;
 }
 
 void myCircularQueueFree(MyCircularQueue* obj) {
     if(!obj){
         return;
     }
+    
+    pthread_mutex_destroy(&(obj->lock));
 
     if(obj->buf){
         free(obj->buf);
@@ -147,3 +193,4 @@ void myCircularQueueFree(MyCircularQueue* obj) {
  
  * myCircularQueueFree(obj);
 */
+
