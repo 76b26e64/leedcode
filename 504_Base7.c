@@ -16,8 +16,12 @@ Constraints:
  */
 
 #define BASE (7)
+#define ANSWER_SIZE (20)
 
 char* convertToBase7(int num) {
+    if(num == 0){
+        return "0";
+    }
 
     bool minus = false;
     if(num < 0){
@@ -25,32 +29,16 @@ char* convertToBase7(int num) {
         num *= -1;
     }
 
-    int tmp[100] = {0};
-    int digit = 0;
-    int val = 0;
+    char *ans = calloc(ANSWER_SIZE, sizeof(char));
+    int index = ANSWER_SIZE - 2; // last index is '\0'
     while(num > 0){
-        val = num % BASE;
-        tmp[digit++] = val;
+        ans[index--] = '0' + (char)(num % BASE);
         num /= BASE;
-    }
+    };
 
-    if(digit == 0){
-        return "0";
-    }
-
-    char *ret;
-    int index;
     if(minus){
-        ret = calloc(digit+2, sizeof(char));
-        ret[index++] = '-';
-    }else{
-        ret = calloc(digit+1, sizeof(char));
+        ans[index--] = '-';
     }
 
-    while(digit > 0){
-        ret[index++] = '0' + (char)tmp[--digit];
-    }
-
-    return ret;
-    
+    return &ans[index+1];
 }
