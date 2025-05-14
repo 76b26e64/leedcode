@@ -38,25 +38,27 @@ Follow up:
 It is very easy to come up with a solution with a runtime of O(n log n). Can you do it in linear time O(n) and possibly in a single pass?
 Can you do it without using any built-in function (i.e., like __builtin_popcount in C++)?
 */
-
 /**
  * Note: The returned array must be malloced, assume caller calls free().
  */
 int* countBits(int n, int* returnSize) {
-    if(n <= 0 || !returnSize){
+    if(n < 0 || !returnSize){
         return NULL;
     }
 
     int *ret = calloc(n+1, sizeof(int));
     *returnSize = n+1;
-    for(int i = 0; i < n+1; i++){
-        int count = 0;
-        int val = i;
-        while(val > 0){
-            count++;
-            val &= (val - 1);
+    ret[0] = 0;
+    if(n == 0){
+        return ret;
+    }
+
+    int top_bit = 1;
+    for(int i = 1; i < n+1; i++){
+        if(i == (top_bit << 1)){
+            top_bit <<= 1;
         }
-        ret[i] = count;
+        ret[i] = ret[i-top_bit] + 1;
     }
      
     return ret; 
