@@ -49,16 +49,8 @@ int* countBits(int n, int* returnSize) {
     int *ret = calloc(n+1, sizeof(int));
     *returnSize = n+1;
     ret[0] = 0;
-    if(n == 0){
-        return ret;
-    }
-
-    int top_bit = 1;
     for(int i = 1; i < n+1; i++){
-        if(i == (top_bit << 1)){
-            top_bit <<= 1;
-        }
-        ret[i] = ret[i-top_bit] + 1;
+        ret[i] = ret[i & (i-1)] + 1;
     }
      
     return ret; 
