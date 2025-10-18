@@ -50,18 +50,19 @@ s contains only the characters ('I', 'V', 'X', 'L', 'C', 'D', 'M').
 It is guaranteed that s is a valid roman numeral in the range [1, 3999].
 */
 
-int roman_char_to_int(char c) {
+static int c_to_num(char c){
     switch(c){
-        case 'I': return 1;
-        case 'V': return 5;
-        case 'X': return 10;
-        case 'L': return 50;
-        case 'C': return 100;
-        case 'D': return 500;
-        case 'M': return 1000;
-        default : break;
+        case 'I':   return 1;
+        case 'V':   return 5;
+        case 'X':   return 10;
+        case 'L':   return 50;
+        case 'C':   return 100;
+        case 'D':   return 500;
+        case 'M':   return 1000;
+        default :   break;  
     }
-    return 0;
+    // '/0' return 0;
+    return 0;   
 }
 
 int romanToInt(char* s) {
@@ -69,13 +70,17 @@ int romanToInt(char* s) {
         return 0;
     }
 
-    int num = 0;
-    for(int i=0; i<strlen(s); i++){
-        if(i != 0 && roman_char_to_int(s[i-1]) < roman_char_to_int(s[i])){
-            num += roman_char_to_int(s[i]) - (roman_char_to_int(s[i-1]) * 2);
+    int answer = 0;
+    int curr = c_to_num(*s);
+    while(*s){
+        int next = c_to_num(*(s+1));
+        if(curr >= next){
+            answer += curr; 
         }else{
-            num += roman_char_to_int(s[i]);
+            answer -= curr; 
         }
-    }
-    return num;
+        s++;
+        curr = next;
+    } 
+    return answer;
 }
