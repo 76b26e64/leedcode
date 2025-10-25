@@ -53,7 +53,8 @@ public:
             int high = nums.size() - 1;
             while(low < high){
                 if(nums.at(i) + nums.at(low) + nums.at(high) == 0){
-                    answer.insert(answer.begin(), {nums.at(i), nums.at(low++), nums.at(high--)});
+                    answer.push_back({nums.at(i), nums.at(low++), nums.at(high--)});
+
                     while(low < high && nums.at(low) == nums.at(low-1)){
                         low++;
                     }
