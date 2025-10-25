@@ -44,21 +44,23 @@ public:
     vector<vector<int>> threeSum(vector<int>& nums) {
         std::sort(nums.begin(), nums.end());
         vector<vector<int>> answer;
-        for (int i = 0; i < nums.size() && nums.at(i) <= 0; i++){
-            if(i != 0 && nums.at(i) == nums.at(i-1)){
+        for (int i = 0; i < nums.size() && nums[i] <= 0; i++){
+            if(i != 0 && nums[i] == nums[i-1]){
                 continue;
             }
 
             int low = i + 1;
             int high = nums.size() - 1;
             while(low < high){
-                if(nums.at(i) + nums.at(low) + nums.at(high) == 0){
-                    answer.push_back({nums.at(i), nums.at(low++), nums.at(high--)});
-
-                    while(low < high && nums.at(low) == nums.at(low-1)){
+                if(nums[i] + nums[low] + nums[high] == 0){
+                    answer.push_back({nums[i], nums[low++], nums[high--]});
+                    while(low < high && nums[low] == nums[low-1]){
                         low++;
                     }
-                }else if(nums.at(i) + nums.at(low) + nums.at(high) < 0){
+                    while(low < high && nums[high] == nums[high+1]){
+                        high--;
+                    }
+                }else if(nums[i] + nums[low] + nums[high] < 0){
                     low++;
                 }else{
                     high--;
