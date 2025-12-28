@@ -4,6 +4,15 @@
  * [20] Valid Parentheses
  */
 
+/*
+ * Problem: 20. Valid Parentheses 
+ * Link: https://leetcode.com/problems/valid-parentheses/description/ 
+ * Difficulty: Easy
+ * Approach: Stacks
+ * Complexity: Time O(n) Space O(n)
+ * Edge cases: 
+*/
+
 // @lc code=start
 class Solution {
 public:
