@@ -31,13 +31,10 @@ public:
             }
         }
 
-        /*
-        for(auto f : freq){
-            std::cout << f.first << " : " << f.second << std::endl;
+        if(freq.empty()){
+            return "";
         }
-        */
-    
-        auto most_common = std::max_element(freq.begin(), freq.end(), 
+        std::string most_common = std::max_element(freq.begin(), freq.end(), 
             [](auto& a, auto& b){return a.second < b.second; })->first;
         return most_common;
     }

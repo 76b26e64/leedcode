@@ -17,50 +17,24 @@
 class Solution {
 public:
     bool isValid(string s) {
-
+        static const std::unordered_map<char, char> pairs = {
+            {'(', ')'},
+            {'{', '}'},
+            {'[', ']'},
+        };
+ 
         std::stack<char> st;
         for(char c : s){
-            if(c == '(' || c == '{' || c == '['){
+            if(pairs.contains(c)){
                 st.push(c);
-            }else if(c == ')' || c == '}' || c == ']'){
-                if(st.empty()){
-                    return false;
-                }
-
-                switch(c){
-                    case ')':
-                        if(st.top() != '('){
-                            return false;
-                        }
-                        st.pop();
-                        break;
-                    case '}':
-                        if(st.top() != '{'){
-                            return false;
-                        }
-                        st.pop();
-                        break;
-                    case ']':
-                        if(st.top() != '['){
-                            return false;
-                        }
-                        st.pop();
-                        break;
-                    default:
-                        // Not reached
-                        return false;
-                }
+            }else if(!st.empty() && pairs.find(st.top())->second == c){
+                st.pop();
             }else{
-                //invalid character
                 return false;
             }
         }
 
-        if(!st.empty()){
-            return false;
-        }
-
-        return true;
+        return st.empty();
     }
 };
 // @lc code=end
