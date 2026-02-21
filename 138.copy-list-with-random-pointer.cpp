@@ -26,41 +26,30 @@ public:
 class Solution {
 public:
     Node* copyRandomList(Node* head) {
-        if(head == nullptr){
+        if(!head){
             return nullptr;
         }
 
         Node* new_head = new Node(head->val);
-        Node* new_prev = nullptr;
-        Node* curr = head->next;
-        int n {1};
-    
         std::unordered_map<Node*, Node*> u = 
         {
             {head, new_head}
         };
 
-        Node* new_curr = nullptr;
-        while(curr != nullptr){
-            new_curr = new Node(curr->val);
-            if(new_head->next == nullptr){
-                new_head->next = new_curr;
-            }else{
-                new_prev->next = new_curr;
-            }
-            u[curr] = new_curr;
-            new_prev = new_curr;
-            curr = curr->next;
-            n++;
+        Node* curr = head->next;
+        Node* new_prev = new_head;
+        for(curr = head->next; curr; curr = curr->next){
+            new_prev->next = new Node(curr->val);
+            u[curr]  = new_prev->next;
+            new_prev = new_prev->next;
         }
        
         curr = head;
-        new_curr = new_head;        
-
-        while(curr != nullptr){
+        Node *new_curr = nullptr;        
+        for(curr = head, new_curr = new_head; 
+            curr && new_curr; 
+            curr = curr->next, new_curr = new_curr->next){
             new_curr->random = u[curr->random];
-            curr = curr->next;
-            new_curr = new_curr->next;
         }
 
         return new_head;
