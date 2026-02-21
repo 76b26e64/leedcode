@@ -2,8 +2,8 @@
  * Problem: 138. Copy List with Random Pointer
  * Link: https://leetcode.com/problems/copy-list-with-random-pointer/description/
  * Difficulty: Medium
- * Approach: Search next nodes, and random node.
- * Complexity: Time :O(n^2) Space : O(n)
+ * Approach: Hashmap
+ * Complexity: Time :O(n) Space : O(n)
  * Edge cases: head == nullptr, n(length = 1)
 */
 
@@ -34,39 +34,33 @@ public:
         Node* new_prev = nullptr;
         Node* curr = head->next;
         int n {1};
+    
+        std::unordered_map<Node*, Node*> u = 
+        {
+            {head, new_head}
+        };
+
+        Node* new_curr = nullptr;
         while(curr != nullptr){
-            Node* new_curr = new Node(curr->val);
+            new_curr = new Node(curr->val);
             if(new_head->next == nullptr){
                 new_head->next = new_curr;
             }else{
                 new_prev->next = new_curr;
             }
+            u[curr] = new_curr;
             new_prev = new_curr;
             curr = curr->next;
             n++;
         }
+       
+        curr = head;
+        new_curr = new_head;        
 
-        for(int i = 0; i < n; i++){
-            curr = head;
-            Node *new_curr = new_head;
-            for(int j = 0; j < i; j++){
-                curr = curr->next;
-                new_curr = new_curr->next;
-            }
-
-            curr = curr->random;
-            int m {0};
-            while(curr != nullptr){
-                curr = curr->next;
-                m++;
-            }
-            
-            Node* new_random = new_head;
-            for(int j = 0; j < (n-m); j++){
-                new_random = new_random->next;
-            }
-            
-            new_curr->random = new_random;
+        while(curr != nullptr){
+            new_curr->random = u[curr->random];
+            curr = curr->next;
+            new_curr = new_curr->next;
         }
 
         return new_head;
