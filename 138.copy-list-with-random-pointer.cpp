@@ -39,7 +39,7 @@ public:
         Node* curr = head->next;
         Node* new_prev = new_head;
         for(curr = head->next; curr; curr = curr->next){
-            new_prev->next = new Node(curr->val);
+            new_prev->next = new Node(curr->val); //new_prev->next is new_curr
             u[curr]  = new_prev->next;
             new_prev = new_prev->next;
         }
