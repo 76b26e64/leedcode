@@ -1,59 +1,106 @@
-class Twitter {
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#include <queue>
 
+class Twitter {
 private:
     const int max_feed = 10;
 
-    struct user_info {
-        std::vector<int> tweets;
-        std::unordered_set<int> followee;
-    };
-    std::unordered_map<int, user_info> users;
-        
-    
-    struct tweets_info {
+    struct tweet_cursor {
+        long long timestamp;   
+        int tweet_id;
         int user_id;
+        int index;
+
+        bool operator<(const tweet_cursor& other) const{
+            return timestamp < other.timestamp;
+        }
+    };
+    
+    struct tweet_info {
+        long long timestamp;   
         int tweet_id;
     };
-    std::vector<struct tweets_info> all_tweets;
+    long long current_time = 0;
+
+    std::unordered_map<int, std::vector<struct tweet_info>> all_tweets;
+    std::unordered_map<int, std::unordered_set<int>> followers;
 
 
 public:
-    Twitter() {
-        
-    }
+    Twitter() {}
     
     void postTweet(int userId, int tweetId) {
-        all_tweets.push_back({userId, tweetId});
+        all_tweets[userId].push_back({current_time, tweetId});
+        current_time++;
     }
     
     vector<int> getNewsFeed(int userId) {
-        vector<int> feed;
-        int count = 0;
+        std::priority_queue<tweet_cursor> max_heap;
 
-        for(auto it = all_tweets.rbegin(); it != all_tweets.rend(); it++){
-            if(users[userId].followee.find(it->user_id) != users[userId].followee.end() || 
-               userId == it->user_id ){
-                feed.push_back(it->tweet_id);
-                count++;
+        auto add_latest_tweet = [&](int target_user_id){
+            auto it = all_tweets.find(target_user_id);
+            if(it == all_tweets.end() || it->second.empty()){
+                return;
             }
 
-            if(count >= max_feed){
-                break;
+            const auto& user_tweets = it->second;
+            int last_index = static_cast<int>(user_tweets.size()) - 1;
+
+            max_heap.push(
+                {user_tweets[last_index].timestamp,
+                 user_tweets[last_index].tweet_id,
+                 target_user_id,
+                 last_index}
+            );
+        };
+
+        add_latest_tweet(userId);
+
+        auto it = followers.find(userId);
+        if(it != followers.end()){
+            for(int follower_id : it->second){
+                add_latest_tweet(follower_id);
+            }
+        }
+
+
+        vector<int> feed;
+        feed.reserve(max_feed);
+        while(!max_heap.empty() && feed.size() < max_feed){
+            tweet_cursor newest = max_heap.top();
+            max_heap.pop();
+
+            feed.push_back(newest.tweet_id);
+       
+            // Get previous tweet of user
+            if(newest.index > 0){
+                int previous_index = newest.index - 1;
+                const tweet_info & previous_tweet = all_tweets.at(newest.user_id)[previous_index];
+                max_heap.push(
+                    {previous_tweet.timestamp,
+                     previous_tweet.tweet_id,
+                     newest.user_id,
+                     previous_index}
+                );
             }
         }
 
         return feed;
-        
     }
     
     void follow(int followerId, int followeeId) {
-        users[followerId].followee.insert(followeeId);
+        if(followerId == followeeId) {
+            return;
+        }
+        followers[followerId].insert(followeeId);
     }
     
     void unfollow(int followerId, int followeeId) {
-        auto it =  users[followerId].followee.find(followeeId);
-        if(it != users[followerId].followee.end()){
-            users[followerId].followee.erase(it);
+        auto it =  followers.find(followerId);
+        if(it != followers.end()){
+            it->second.erase(followeeId);
         }
     }
 };
