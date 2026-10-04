@@ -58,6 +58,7 @@ public:
             );
         };
 
+        // Push my latest tweet and follower's latest tweet to max_heap.
         add_latest_tweet(userId);
 
         auto it = users.find(userId);
@@ -76,7 +77,7 @@ public:
 
             feed.push_back(newest.tweet_id);
        
-            // Get previous tweet of user
+            // push previous tweet of user to max_heap
             if(newest.index > 0){
                 int previous_index = newest.index - 1;
                 const tweet_info& previous_tweet = users.at(newest.user_id).tweets[previous_index];
